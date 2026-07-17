@@ -1,5 +1,12 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e1524">
+<!-- CACHE YASAK: Live Server (port 5500) workspace'te herhangi bir dosya değişince açık sekmeyi
+     yeniler; tarayıcı cache'ten servis edince banka 204 -> eski 111 sürümüne düşüyordu.
+     Bu üç satır o döngüyü kırar; Ctrl+Shift+R'ye gerek kalmaz. (teşhis 2026-07-17) -->
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>QPM MC-Trainer</title>
 <style>
 :root{--bg:#0e1524;--card:#16203a;--fg:#e8eef7;--mut:#8ea3c4;--line:#26324f;--ok:#2ecc71;--no:#e74c3c;--acc:#4c8bf5;--warn:#e0a800;}
@@ -7,6 +14,27 @@
 body{background:var(--bg);color:var(--fg);font-family:'Segoe UI',system-ui,Arial,sans-serif;
  display:flex;flex-direction:column;align-items:center;padding:14px;line-height:1.5}
 .wrap{width:100%;max-width:660px}
+
+/* ── EMİR'İN NOTLARI — kokpitle AYNI localStorage anahtarı (cesmat.j.v1).
+      Aynı origin olduğu için kokpitin Gist senkronu bu notları da taşır. Tek günlük. */
+#jbox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px;margin-top:14px}
+#jbox .jt{font-size:10px;letter-spacing:.14em;color:var(--mut);margin-bottom:8px;font-weight:600}
+#jbox textarea{width:100%;background:#0a1020;color:var(--fg);border:1px solid var(--line);
+  border-radius:7px;padding:9px;font:inherit;font-size:13px;resize:vertical}
+#jbox .jrow{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:7px}
+#jbox select{background:#0a1020;color:var(--fg);border:1px solid var(--line);border-radius:7px;padding:7px}
+#jlist{margin-top:9px;max-height:230px;overflow:auto}
+.jent{border-left:3px solid var(--acc);background:#0a1020;border-radius:6px;padding:7px 10px;margin:6px 0;font-size:13px}
+.jent .jh{font-size:10px;color:var(--mut);margin-bottom:2px}
+
+/* ── TELEFON */
+@media (max-width:640px){
+  body{padding:9px}
+  .wrap{max-width:100%}
+  button,.btn{min-height:44px}        /* parmakla basılabilir */
+  #card{font-size:15px}
+  header{flex-wrap:wrap}
+}
 header{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 h1{font-size:14px;margin:0;color:var(--mut);font-weight:600;letter-spacing:.5px}
 .prog{font-size:12px;color:var(--mut)}
@@ -104,6 +132,24 @@ button.opt.sel .box{background:var(--acc);border-color:var(--acc);box-shadow:ins
    <span id="sess"></span>
    <span><a id="exp">sichern</a> · <a id="imp">laden</a> · <a id="reset">zurücksetzen</a></span>
  </footer>
+
+ <div id="jbox">
+   <div class="jt">📓 EMİR'İN NOTLARI — ne zor geldi, ne oturdu? 1-2 cümle. Silinmez.</div>
+   <div class="jrow" style="margin-bottom:7px">
+     <select id="jk"></select>
+     <span class="small">← hangi konu</span>
+   </div>
+   <textarea id="jt" rows="2" placeholder="örn: Cp/Cpk'da hangi formülün ne zaman kullanıldığını sürekli karıştırıyorum — Cpk tek taraflıyı da yakalıyor."></textarea>
+   <div class="jrow">
+     <button id="jsave">💾 Kaydet</button>
+     <button id="jexp">📤 Export</button>
+     <span class="small" id="jstat"></span>
+   </div>
+   <div id="jlist"></div>
+   <div class="small" style="margin-top:7px;opacity:.75">
+     Kokpitle <b>aynı</b> günlüğe yazar (cesmat.j.v1) → kokpitteki ☁ Gist senkronu bunları da taşır.
+   </div>
+ </div>
 </div>
 <div class="flash" id="flash"></div>
 <script>
@@ -439,5 +485,46 @@ document.getElementById("reset").onclick=()=>{
   if(prompt("Fortschritt WIRKLICH löschen? Tippe LÖSCHEN:")==="LÖSCHEN"){
     localStorage.removeItem(KEY); S={tick:0,q:{},cfg:{N:DEF.N,K:DEF.K,T:0},filter:"all",mode:"alle"}; sess={a:0,r:0,g:0,w:0}; syncCfg(); draw(); }
 };
-syncCfg(); draw();
+/* ═══════════ EMİR'İN NOTLARI — kokpitle ORTAK günlük ═══════════
+   Anahtar kasıtlı olarak kokpitinkiyle AYNI (cesmat.j.v1) ve sürümden bağımsız sabit:
+   trainer yeniden derlense de silinmez, ve kokpitin ☁ Gist senkronu bu notları da taşır.
+   Kayıt şeması kokpitle birebir: {t: ISO, d: ders, k: konu, x: metin}            */
+const JKEY="cesmat.j.v1";
+let J=(()=>{try{return JSON.parse(localStorage.getItem(JKEY))||[]}catch(e){return []}})();
+const jsave=()=>localStorage.setItem(JKEY,JSON.stringify(J));
+const jesc=s=>{const d=document.createElement("div");d.textContent=s;return d.innerHTML};
+
+function jKonular(){
+  const s=new Set(BANK.map(q=>q.teil+" · "+q.topic));
+  return [...s].sort();
+}
+function jDraw(){
+  const sel=document.getElementById("jk");
+  if(!sel.options.length)
+    sel.innerHTML='<option value="">— konu seçme —</option>'+
+      jKonular().map(k=>`<option value="${jesc(k)}">${jesc(k)}</option>`).join("");
+  const mine=J.filter(e=>e.d==="quapm");
+  document.getElementById("jlist").innerHTML =
+    J.slice().reverse().slice(0,25).map(e=>
+      `<div class="jent"><div class="jh">${e.t.slice(0,16).replace("T"," ")} · ${jesc(e.d)}${e.k?" · "+jesc(e.k):""}</div>${jesc(e.x)}</div>`
+    ).join("") || '<div class="small">Henüz not yok. Bir konu çalıştıktan sonra 1-2 cümle yaz.</div>';
+  document.getElementById("jstat").textContent=`${mine.length} QPM notu · toplam ${J.length}`;
+}
+document.getElementById("jsave").onclick=()=>{
+  const t=document.getElementById("jt");
+  if(!t.value.trim())return;
+  J.push({t:new Date().toISOString(), d:"quapm",
+          k:document.getElementById("jk").value, x:t.value.trim()});
+  jsave(); t.value=""; jDraw();
+};
+document.getElementById("jexp").onclick=()=>{
+  const b=new Blob([JSON.stringify({exported:new Date().toISOString(),journal:J},null,1)],
+                   {type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);
+  a.download="cesmat_journal_"+new Date().toISOString().slice(0,10)+".json";
+  a.click();
+};
+
+syncCfg(); draw(); jDraw();
 </script></body></html>

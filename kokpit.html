@@ -94,7 +94,8 @@ textarea{width:100%;background:#0a0d12;color:var(--fg);border:1px solid var(--bo
 <div class="pan">
   <div class="pt">🗓 TAKVİM — üç sınav, 18 gün</div>
   <div class="grid" id="cal"></div>
-  <div class="small" style="margin-top:8px">⚠️ mat3/mat4 tarihleri <b>DOĞRULANMADI</b> ("27 ağustos / 2 eylül falan"). RWTHonline'dan teyit et → Claude'a söyle → sabitlensin.</div>
+  <div class="small" style="margin-top:8px">✅ <b>mat4 = 02.09.2026, 14:30–17:00, Temp2</b> — Moodle'dan teyitli.
+    ⚠️ <b>mat3 tarihi hâlâ doğrulanmadı</b> ("27 ağustos falan") → RWTHonline'dan bak.</div>
 </div>
 
 <div class="pan">
@@ -295,7 +296,7 @@ function drawCov(){
 
 function drawCal(){
   document.getElementById('cal').innerHTML=['mat3','mat4','quapm'].map(d=>{
-    const kl=kalan(d), acil=kl<=45, dogru=(d==='quapm');
+    const kl=kalan(d), acil=kl<=45, dogru=(d!=='mat3');   // mat4 artık Moodle'dan teyitli
     const bos=!(META[d]&&META[d].konular.length)&&d!=='quapm';
     return `<div class="kk" style="border-left-color:${bos?'var(--red)':acil?'var(--amb)':'var(--grn)'}">
       <div class="n"><span>${d.toUpperCase()}</span><span class="badge">${dogru?'kesin':'⚠️ teyitsiz'}</span></div>
@@ -308,14 +309,20 @@ function drawCal(){
 // ── nag: kafana vuran panel
 function drawNag(){
   const out=[];
-  if(S.ders==='mat4')
-    out.push(`<div class="warn" style="background:#2a2416;border-color:var(--amb)">
-      <b>🕰 Tahminlerin tavanı:</b> senin dönemini (SS2026) <b>Ortleb / Paar / Netterdon</b> veriyor —
-      arşivdeki 22 sınavın <b>hiçbirini</b> onlar yazmadı. „Vertr.-Prof.\" = vekil prof, genelde kendi
-      sınavını yazar.
-      <br><span class="small">Slot yüzdeleri (A7 %100, A8 %100…) <b>başka insanların</b> alışkanlığı.
-      Konular muhtemelen kalır, stil değişebilir. → <b>bu dönemin HA + SRÜ'lerine</b> en yüksek ağırlık,
-      sonra ws25/ss25 (Sikstel/Singh). Detay: mat4/KADRO_VE_DRIFT.md · ⛔ SRÜ 1,2,3,6-13 hâlâ eksik.</span></div>`);
+  if(S.ders==='mat4'){
+    out.push(`<div class="warn ok">
+      <b>🎯 ws25 = BU SINAVIN MODELİ.</b> Ortleb'in ekibi <b>ces4_ws25 sınavını birebir</b>
+      „Selbstrechenübung 15\" olarak dağıtmış (24.07.2026) — 8/8 Aufgabe, aynı sırada, Jaccard 0.71–0.96.
+      Tahmin değil, <b>kadronun kendi seçimi</b>.
+      <br><span class="small">Öncelik: ① ws25'in 8 Aufgabe'sini tam çöz ② SS26'nın kendi HA+SRÜ'leri
+      (çözümleri var) ③ ss25 ④ ⭐ tekrar eden aileler. Detay: mat4/00-SS26-KLAUSUR-INTEL.md</span></div>`);
+    out.push(`<div class="warn" style="background:#16202a;border-color:var(--blu)">
+      <b>🖊 Sınavda 2 adet EL YAZISI, ÇİFT TARAFLI A4 serbest</b> (= 4 sayfa kendi notun).
+      Taschenrechner ❌ · Formelsammlung ❌ · fotokopi ❌
+      <br><span class="small">→ <b>_ANGRIFF.md okuma dosyası değil, o 2 A4'ün taslağı.</b>
+      Sınavdan önce elle geçir. · 02.09.2026 14:30–17:00 Temp2 · 150 dk · 50 P ·
+      geçme 24.5 (%49) · SS25'te kalma oranı ~%6 · bonus %10 (=5 P) → sınavda 19.5 yetiyor.</span></div>`);
+  }
   const km3=kalan('mat3');
   if(!META.mat3.konular.length)
     out.push(`<div class="warn"><b>📦 mat3 ${km3} gün sonra — 22 Klausur indirildi ama işlenmedi (stack'te).</b>

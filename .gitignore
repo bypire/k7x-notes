@@ -1,0 +1,8 @@
+# Bu repo SADECE üretilmiş HTML barındırır.
+# Okul materyali ve kişisel veri asla girmez — publish.py bunu her çalıştırmada DOĞRULAR.
+*.pdf
+*.pptx
+*.docx
+*.zip
+*_journal*.json
+cesmat_journal_*.json

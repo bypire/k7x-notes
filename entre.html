@@ -1038,7 +1038,11 @@ function bkPick(m){
     },1000);
   }
 }
-document.getElementById("btnBucket").onclick=function(){ bkOpen?closeBucket():openBucket(); };
+/* BUCKET (Abkürzung eşleştirme) QPM'e özel: Entre'de DOM çipi basılmaz.
+   Korumasız bağlama burada patlıyordu ve hemen altındaki draw() hiç çalışmıyordu
+   ⇒ trainer soru göstermiyordu. Yukarıdaki updBucketChip() zaten if(!c) return ile korumalı. */
+var _bb=document.getElementById("btnBucket");
+if(_bb) _bb.onclick=function(){ bkOpen?closeBucket():openBucket(); };
 updBucketChip();
 
 syncCfg(); draw(); jDraw();

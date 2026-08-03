@@ -2,57 +2,78 @@
 <html lang="tr"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0d1117">
+<meta name="theme-color" content="#080a0c">
 <title>CESMAT</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚡</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23080a0c'/><rect x='6' y='6' width='7' height='7' fill='%23f0b429'/><rect x='19' y='6' width='7' height='7' fill='%23464e57'/><rect x='6' y='19' width='7' height='7' fill='%23464e57'/><rect x='19' y='19' width='7' height='7' fill='%23464e57'/></svg>">
 <style>
+:root{--bg:#080a0c;--ink:#e9ecef;--dim:#78818c;--dimmer:#464e57;--rule:#171b20;
+  --lift:#0f1317;--accent:#f0b429;
+  --mono:ui-monospace,'SF Mono','JetBrains Mono',Menlo,monospace;
+  --sans:-apple-system,'Segoe UI',system-ui,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0d1117;color:#e6edf3;font:16px/1.6 system-ui,'Segoe UI',sans-serif;
-     padding:22px;max-width:680px;margin:0 auto;min-height:100vh}
-h1{font-size:19px;letter-spacing:.14em}
-.s{color:#8b949e;font-size:13px;margin-bottom:20px}
-h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#8b949e;
-   margin:22px 0 9px;padding-bottom:5px;border-bottom:1px solid #21262d}
-a.card{display:flex;align-items:baseline;gap:10px;background:#161b22;border:1px solid #30363d;
-  border-left:4px solid #58a6ff;border-radius:10px;padding:14px 16px;margin-bottom:9px;
-  text-decoration:none;color:inherit}
-a.card:hover{border-color:#58a6ff}
-a.card b{font-size:15px}
-a.card span{display:block;color:#8b949e;font-size:13px;margin-top:3px}
-a.card .v{margin-left:auto;color:#484f58;font-size:11px;font-family:ui-monospace,monospace;
-  white-space:nowrap;align-self:center}
-.g2{border-left-color:#bc8cff}.g3{border-left-color:#3fb950}.g4{border-left-color:#d29922}
-.n{margin-top:24px;color:#8b949e;font-size:12px;border-top:1px solid #30363d;padding-top:12px}
-.n code{color:#7d8590}
-</style></head><body>
-<h1>⚡ CESMAT</h1>
-<div class="s">Aktif geri çağırma. Telefondan da çalışır. — <b>03.08.2026 18:10</b></div>
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--sans);
+  padding:0 0 70px;font-feature-settings:"tnum" 1;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(240,180,41,.055),transparent)}
+.wrap{max-width:680px;margin:0 auto;padding:0 20px}
+header{padding:34px 0 0}
+.mark{display:flex;align-items:baseline;gap:12px}
+.mark h1{font:700 15px/1 var(--mono);letter-spacing:.34em;text-transform:uppercase}
+.mark .rule{flex:1;height:1px;background:var(--rule)}
+.mark .built{font:400 11px/1 var(--mono);color:var(--dimmer);letter-spacing:.06em}
+.cd{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin:24px 0 30px}
+.cd div{background:var(--bg);padding:13px 12px 11px;position:relative}
+.cd .n{font:600 27px/1 var(--mono);letter-spacing:-.03em;color:var(--c)}
+.cd .n s{text-decoration:none;font-size:12px;font-weight:400;color:var(--dim);margin-left:3px}
+.cd .k{font:500 10px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dim);margin-top:7px}
+.cd .d{font:400 10px/1.4 var(--mono);color:var(--dimmer)}
+.cd div[data-next="1"]::before{content:"";position:absolute;inset:0 0 auto 0;height:2px;
+  background:var(--c)}
+h2{font:500 10px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--dimmer);
+  margin:26px 0 8px;display:flex;align-items:center;gap:10px}
+h2::after{content:"";flex:1;height:1px;background:var(--rule)}
+a.row{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:12px;
+  padding:10px 10px 10px 9px;margin-left:-9px;text-decoration:none;color:inherit;
+  border-radius:3px;position:relative;transition:background .1s}
+a.row:hover,a.row:active{background:var(--lift)}
+a.row::before{content:"";position:absolute;left:0;top:7px;bottom:7px;width:2px;
+  background:var(--c);opacity:0;transition:opacity .1s}
+a.row:hover::before,a.row:active::before{opacity:1}
+a.row b{font:500 15px/1.4 var(--sans);display:block;letter-spacing:-.005em}
+a.row i{font:400 12.5px/1.45 var(--sans);font-style:normal;color:var(--dim)}
+a.row .mt{font:400 10.5px/1.5 var(--mono);color:var(--dimmer);white-space:nowrap}
+footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--rule);
+  font:400 12px/1.7 var(--sans);color:var(--dim)}
+footer code{font:400 11px/1.5 var(--mono);color:var(--dimmer)}
+@media(max-width:560px){.cd{grid-template-columns:repeat(2,1fr)}a.row .mt{display:none}}
+</style></head><body><div class="wrap">
+<header><div class="mark"><h1>CESMAT</h1><div class="rule"></div>
+<div class="built">03.08.2026 18:10</div></div></header>
 
+<nav class="cd"><div style="--c:#3fb950" data-next="1"><div class="n">7<s>gün</s></div><div class="k">entre</div><div class="d">11.08.2026</div></div><div style="--c:#d29922"><div class="n">23<s>gün</s></div><div class="k">mat3</div><div class="d">27.08.2026</div></div><div style="--c:#58a6ff"><div class="n">29<s>gün</s></div><div class="k">mat4</div><div class="d">02.09.2026</div></div><div style="--c:#bc8cff"><div class="n">41<s>gün</s></div><div class="k">quapm</div><div class="d">14.09.2026</div></div></nav>
 <h2>Genel</h2>
-<a class="card " href="kokpit.html?v=270d20d9"><div><b>Kokpit</b><span>Kapsama haritası · Erster Zug · günlük</span></div><div class="v">270d20d9 · 794 KB</div></a>
+<a class="row" href="kokpit.html?v=270d20d9" style="--c:#f0b429"><div><b>Kokpit</b><i>Kapsama haritası · Erster Zug · günlük</i></div><div class="mt">794 KB</div></a>
 <h2>QuaPM · 14.09</h2>
-<a class="card g2" href="quapm.html?v=dc94d048"><div><b>QuaPM MC-Trainer</b><span>MC · Rechen · Abkürzung · konu kartları</span></div><div class="v">dc94d048 · 476 KB</div></a>
-<a class="card g2" href="drill-qpm.html?v=2cbdb175"><div><b>QuaPM Netzplan-Drill</b><span>MPM: paralel · karışık AOB · Überlappung · GP↔FP</span></div><div class="v">2cbdb175 · 790 KB</div></a>
-<a class="card g2" href="juice-qpm.html?v=ec0c87d2"><div><b>QuaPM JUICE</b><span>konu konu: ne + notasyon + NASIL SORULUR</span></div><div class="v">ec0c87d2 · 25 KB</div></a>
+<a class="row" href="quapm.html?v=dc94d048" style="--c:#bc8cff"><div><b>QuaPM MC-Trainer</b><i>MC · Rechen · Abkürzung · konu kartları</i></div><div class="mt">476 KB</div></a>
+<a class="row" href="drill-qpm.html?v=2cbdb175" style="--c:#bc8cff"><div><b>QuaPM Netzplan-Drill</b><i>MPM: paralel · karışık AOB · Überlappung · GP↔FP</i></div><div class="mt">790 KB</div></a>
+<a class="row" href="juice-qpm.html?v=ec0c87d2" style="--c:#bc8cff"><div><b>QuaPM JUICE</b><i>konu konu: ne + notasyon + NASIL SORULUR</i></div><div class="mt">25 KB</div></a>
 <h2>Entre 101 · 11.08</h2>
-<a class="card g3" href="entre.html?v=1ef7097c"><div><b>Entrepreneurship 101 — Trainer</b><span>Thinking &amp; Acting 1/2/3 · slide-grounded</span></div><div class="v">1ef7097c · 183 KB</div></a>
+<a class="row" href="entre.html?v=1ef7097c" style="--c:#3fb950"><div><b>Entrepreneurship 101 — Trainer</b><i>Thinking & Acting 1/2/3 · slide-grounded</i></div><div class="mt">183 KB</div></a>
 <h2>mat3 · 27.08</h2>
-<a class="card g4" href="formelzettel-mat3.html?v=639adf19"><div><b>mat3 Formelzettel</b><span>4 sayfa · sınavda yanına alacağın kâğıt</span></div><div class="v">639adf19 · 683 KB</div></a>
-<a class="card g4" href="guide-vektoranalysis.html?v=4e2046bb"><div><b>Vektoranalysis GUIDE</b><span>Gauß · Stokes · polar · Kugel · param</span></div><div class="v">4e2046bb · 984 KB</div></a>
-<a class="card g4" href="angriff-mat3-a3.html?v=fa187299"><div><b>mat3 A3 — Angriffsplan</b><span>gör → ilk hamle</span></div><div class="v">fa187299 · 642 KB</div></a>
-<a class="card g4" href="angriff-mat3-a4.html?v=32cbf22d"><div><b>mat3 A4 — Angriffsplan</b><span>gör → ilk hamle</span></div><div class="v">32cbf22d · 640 KB</div></a>
-<a class="card g4" href="angriff-mat3-a7.html?v=c46e8eae"><div><b>mat3 A7 — Angriffsplan</b><span>gör → ilk hamle</span></div><div class="v">c46e8eae · 637 KB</div></a>
+<a class="row" href="formelzettel-mat3.html?v=639adf19" style="--c:#d29922"><div><b>mat3 Formelzettel</b><i>4 sayfa · sınavda yanına alacağın kâğıt</i></div><div class="mt">683 KB</div></a>
+<a class="row" href="guide-vektoranalysis.html?v=4e2046bb" style="--c:#d29922"><div><b>Vektoranalysis GUIDE</b><i>Gauß · Stokes · polar · Kugel · param</i></div><div class="mt">984 KB</div></a>
+<a class="row" href="angriff-mat3-a3.html?v=fa187299" style="--c:#d29922"><div><b>mat3 A3 — Angriffsplan</b><i>gör → ilk hamle</i></div><div class="mt">642 KB</div></a>
+<a class="row" href="angriff-mat3-a4.html?v=32cbf22d" style="--c:#d29922"><div><b>mat3 A4 — Angriffsplan</b><i>gör → ilk hamle</i></div><div class="mt">640 KB</div></a>
+<a class="row" href="angriff-mat3-a7.html?v=c46e8eae" style="--c:#d29922"><div><b>mat3 A7 — Angriffsplan</b><i>gör → ilk hamle</i></div><div class="mt">637 KB</div></a>
 <h2>mat4 · 02.09</h2>
-<a class="card " href="formelzettel-mat4.html?v=dcad500c"><div><b>mat4 Formelzettel</b><span>4 sayfa · sınavda yanına alacağın kâğıt</span></div><div class="v">dcad500c · 682 KB</div></a>
-<a class="card " href="drill-mat4.html?v=1b1904f2"><div><b>mat4 Soru-Tipi Drill</b><span>tip seç → taze varyant → çöz</span></div><div class="v">1b1904f2 · 1320 KB</div></a>
+<a class="row" href="formelzettel-mat4.html?v=dcad500c" style="--c:#58a6ff"><div><b>mat4 Formelzettel</b><i>4 sayfa · sınavda yanına alacağın kâğıt</i></div><div class="mt">682 KB</div></a>
+<a class="row" href="drill-mat4.html?v=1b1904f2" style="--c:#58a6ff"><div><b>mat4 Soru-Tipi Drill</b><i>tip seç → taze varyant → çöz</i></div><div class="mt">1320 KB</div></a>
 
-<div class="n">
-  Her linkin sonundaki <code>?v=…</code> o dosyanın <b>içerik hash'i</b>: içerik değişince
-  link değişir, tarayıcı eski kopyayı veremez. Dosya adları sabit kaldığı için ana ekrana
-  eklediğin kısayollar bozulmaz.<br>
-  Bu panel sunucudan <code>max-age=600</code> ile gelir — en fazla 10 dk bayat kalır, sonra
-  kendini tazeler. Hemen istersen: aşağı çekip yenile.<br>
-  İlerleme tarayıcıda (localStorage) tutulur. Ders materyali burada <b>yok</b> ve olmayacak.<br>
-  Ana ekrana ekle: paylaş → „Ana Ekrana Ekle".
-</div>
-</body></html>
+<footer>
+  Link sonundaki <code>?v=</code> içerik hash'i — içerik değişince tarayıcı eskiyi veremez.
+  Ana ekrana ekle: paylaş → „Ana Ekrana Ekle".<br>
+  İlerleme cihazda (localStorage) tutulur. Ders materyali ve PDF burada <b>yok</b> ve olmayacak.
+</footer>
+</div></body></html>

@@ -232,6 +232,33 @@ button.opt.sel .box{background:var(--acc);border-color:var(--acc);box-shadow:ins
  border-radius:9px;padding:11px 13px;font:inherit;font-size:14px;cursor:pointer}
 .pmodsel button:hover{border-color:var(--acc)}
 .pmodsel .ps{display:block;color:var(--mut);font-size:11.5px;margin-top:3px}
+
+.dz{border:1px solid #30363d;border-radius:9px;padding:13px;margin-bottom:12px}
+.dzh{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid #21262d;padding-bottom:8px}
+.dzh b{font-size:15px} .dzh span{color:#8b949e;font-size:12px;margin-left:auto}
+.dzs{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#6e7681;margin:11px 0 6px}
+.dzt{width:100%;border-collapse:collapse;font-size:13px}
+.dzt td{padding:3px 0;border-bottom:1px solid #161b22}
+.dzt td.n{text-align:right;color:#f0b429;font-family:ui-monospace,monospace;width:52px}
+.dzr{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid #161b22}
+.dzr .n{color:#f85149;font:600 13px/1 ui-monospace,monospace;width:34px;flex:none}
+.dzr div{flex:1;min-width:0}
+.dzr b{display:block;font-size:13.5px}
+.dzr i{display:block;font-style:normal;color:#8b949e;font-size:12px;margin-top:2px}
+.dzr u{display:block;text-decoration:none;color:#6e7681;font-size:11px;margin-top:3px}
+.dzk{background:none;border:1px solid #30363d;border-radius:5px;color:#8b949e;cursor:pointer;
+  padding:4px 7px;flex:none}
+.dzk:hover{border-color:#f0b429;color:#e9ecef}
+.tekrar{display:inline-flex;align-items:center;gap:6px;background:rgba(248,81,73,.12);
+  border:1px solid rgba(248,81,73,.3);border-radius:6px;padding:5px 9px;margin-bottom:9px;
+  font-size:12.5px;color:#f8c8c5;cursor:pointer}
+.tekrar b{color:#f85149}
+
+.dtabs{display:flex;gap:6px;margin-bottom:10px}
+.dt{background:none;border:1px solid #30363d;border-radius:6px;color:#8b949e;cursor:pointer;
+  padding:6px 11px;font-size:12.5px}
+.dt.on{border-color:#f0b429;color:#e9ecef}
+.dt:hover{color:#e9ecef}
 </style></head><body>
  
 <style>
@@ -286,7 +313,7 @@ button.opt.sel .box{background:var(--acc);border-color:var(--acc);box-shadow:ins
    <div class="small">Höheres N/K = brutaler. „Geraten“ zählt nie als Fortschritt. Zeitlimit 0 = aus; läuft die Zeit ab, gilt es als „Weiß nicht“.</div>
  </div>
  <div class="panel" id="pTopics"><div class="topics" id="topicList"></div></div>
- <div class="panel bilanz" id="pBilanz"><div id="bilanzList"></div></div>
+ <div class="panel bilanz" id="pBilanz"><div class="dtabs"><button class="dt on" data-d="bilanz">Bilanz</button><button class="dt" data-d="durum">📋 Durum raporları</button></div><div id="bilanzList"></div><div id="durumList" hidden></div></div>
  <div class="err" id="err"></div>
  <div class="card" id="card"></div>
  <footer>
@@ -549,7 +576,7 @@ function exAbgeben(skip){
   }
   var s=st(q.id); s.seen++; s.last=S.tick;      /* Bilanz sayaçları beslenir, seri DEĞİŞMEZ */
   if(skip||!EX.sel.size) s.skip++; else if(!ok) s.wrong++;
-  save();
+  save(); durumKontrol();
    
   var _dogruIdx=EX.opts.map(function(o,i){ return i; })
                        .filter(function(i){ return q._set.has(sha256(SALT+EX.opts[i])); });
@@ -737,6 +764,13 @@ function draw(){
               : kind==="text" ? '<span class="rtag">Abkürzung ausschreiben</span>'
               : cur._neg ? '<span class="negtag">Negativfrage · die FALSCHE Aussage suchen</span>'
               : cur.m ? '<span class="multitag">Mehrfachauswahl · Anzahl unbekannt</span>' : '';
+   
+  var _sv=st(cur.id), _dn=durumNerede(cur.id);
+  const tekrarUyari = (_sv.wrong+_sv.skip)>0
+    ? '<div class="tekrar" id="tekrarBtn"><b>!</b> bu soruyu daha önce <b>'
+      +(_sv.wrong+_sv.skip)+'×</b> patlattın'
+      +(_dn.length?' — <b>Durum '+_dn.join(", ")+'</b> raporunda var (tıkla)':'')+'</div>'
+    : '';
   const _pool = cur._neg ? cur.neg : cur.stems;
   let _si = Math.floor(Math.random() * _pool.length);
   if (_pool.length > 1 && _si === s.ls) _si = (_si + 1 + Math.floor(Math.random() * (_pool.length - 1))) % _pool.length;
@@ -754,7 +788,7 @@ function draw(){
       return '<button class="opt" data-i="'+i+'"><span class="k">'+(i+1)+'</span>'+((cur.m&&!cur._neg)?'<span class="box"></span>':'')+'<span>'+o+'</span></button>';}).join('')+'</div>';
   }
   card.innerHTML=`<div class="meta"><span class="tag">Teil ${cur.teil} · ${cur.topic}</span>
-    ${badge}
+    ${tekrarUyari}${badge}
     <span class="dots" title="${s.streak}/${S.cfg.N} in Folge">${dots}</span></div>
     ${cur.text?`<div class="anlage">${cur.text}</div>`:''}
     <div class="q">${stem}</div>
@@ -892,6 +926,65 @@ function drawTopics(){
 }
  
 function bEsc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML;}
+
+ 
+const DURUM_ESIK = 50;
+function durumlar(){ if(!S.durum) S.durum=[]; return S.durum; }
+function toplamYanlis(){ return BANK.reduce(function(a,q){var s=st(q.id);return a+s.wrong+s.skip;},0); }
+
+function durumKontrol(){
+  /* Eşiği geçtiysek YENİ durum dondur. Birden çok eşik atlanmışsa hepsini üretme —
+     son eşik yeter (offline uzun oturumdan sonra 5 rapor basmasın). */
+  var t=toplamYanlis(), D=durumlar();
+  var hedef=Math.floor(t/DURUM_ESIK);
+  if(hedef<1 || D.length>=hedef) return null;
+  var rows=BANK.map(function(q){var s=st(q.id);return {id:q.id,topic:q.topic,teil:q.teil,
+      stem:q.stems[0],bad:s.wrong+s.skip,wrong:s.wrong,skip:s.skip,k:q.k||null};})
+    .filter(function(r){return r.bad>0;}).sort(function(a,b){return b.bad-a.bad;});
+  var konu={}; rows.forEach(function(r){ konu[r.topic]=(konu[r.topic]||0)+r.bad; });
+  var d={n:D.length+1, t:t, tarih:new Date().toISOString().slice(0,16).replace("T"," "),
+         rows:rows.slice(0,40),
+         konu:Object.keys(konu).map(function(k){return [k,konu[k]];})
+                   .sort(function(a,b){return b[1]-a[1];}).slice(0,12)};
+  D.push(d); save();
+  return d;
+}
+function durumNerede(qid){
+  /* Bu soru hangi durum raporlarında geçiyor → „durum3'te var" uyarısı için. */
+  var out=[]; durumlar().forEach(function(d){
+    if(d.rows.some(function(r){return r.id===qid;})) out.push(d.n); });
+  return out;
+}
+function durumHTML(d){
+  var h='<div class="dz"><div class="dzh"><b>Durum '+d.n+'</b>'
+       +'<span>'+d.tarih+' · '+d.t+' yanlış birikti</span></div>';
+  h+='<div class="dzs">En çok patladığın konular</div><table class="dzt">';
+  d.konu.forEach(function(k){ h+='<tr><td>'+bEsc(k[0])+'</td><td class="n">'+k[1]+'×</td></tr>'; });
+  h+='</table><div class="dzs">Tek tek sorular ('+d.rows.length+')</div>';
+  d.rows.forEach(function(r){
+    h+='<div class="dzr"><span class="n">'+r.bad+'×</span><div><b>'+bEsc(r.topic)+'</b>'
+      +'<i>'+bEsc(r.stem.length>120?r.stem.slice(0,118)+"…":r.stem)+'</i>'
+      +'<u>'+r.wrong+' yanlış · '+r.skip+' bilmiyorum</u></div>'
+      +(r.k?'<button class="dzk" data-k="'+r.k+'">📖</button>':'')+'</div>';
+  });
+  return h+'</div>';
+}
+function drawDurum(){
+  var box=document.getElementById("durumList"); if(!box) return;
+  var D=durumlar();
+  if(!D.length){
+    var t=toplamYanlis();
+    box.innerHTML='<div class="small">Henüz durum raporu yok. Her <b>'+DURUM_ESIK
+      +'</b> yanlışta bir, „şunları yapamadın" dökümü otomatik dondurulur.<br>'
+      +'Şu an: <b>'+t+'</b> / '+DURUM_ESIK+' — '+(DURUM_ESIK-(t%DURUM_ESIK))+' yanlış kaldı.</div>';
+    return;
+  }
+  box.innerHTML=D.slice().reverse().map(durumHTML).join("");
+  box.querySelectorAll(".dzk").forEach(function(b){
+    b.onclick=function(){ openKarte(b.dataset.k,null); };
+  });
+}
+
 function drawBilanz(){
   const box=document.getElementById("bilanzList");
   const rows=scope().map(q=>{const s=st(q.id);return {q:q,s:s,bad:s.wrong+s.skip};}).filter(r=>r.bad>0);
@@ -1119,6 +1212,27 @@ function bkPick(m){
 var _bb=document.getElementById("btnBucket");
 if(_bb) _bb.onclick=function(){ bkOpen?closeBucket():openBucket(); };
 updBucketChip();
+
+
+/* Bilanz ↔ Durum sekmeleri + „tekrar uyarısı"na tıklayınca durum raporuna götür */
+document.addEventListener("click", function(e){
+  var t=e.target.closest ? e.target.closest(".dt") : null;
+  if(t){
+    document.querySelectorAll(".dt").forEach(function(b){ b.classList.toggle("on", b===t); });
+    var bl=document.getElementById("bilanzList"), dl=document.getElementById("durumList");
+    var durum=(t.dataset.d==="durum");
+    if(bl) bl.hidden=durum; if(dl) dl.hidden=!durum;
+    if(durum) drawDurum(); else drawBilanz();
+    return;
+  }
+  var u=e.target.closest ? e.target.closest("#tekrarBtn") : null;
+  if(u){
+    var p=document.getElementById("pBilanz"); if(!p) return;
+    p.classList.add("show");
+    var db=document.querySelector('.dt[data-d="durum"]'); if(db) db.click();
+    p.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+});
 
 syncCfg(); draw(); jDraw();
 </script></body></html>

@@ -225,6 +225,19 @@ button.opt.sel .box{background:var(--acc);border-color:var(--acc);box-shadow:ins
 .pbig{font-size:34px;font-weight:800;margin:4px 0}
 .pbig.ok{color:var(--ok)}.pbig.no{color:var(--no)}
 .pline{font-size:12.5px;color:var(--mut);margin:4px 0}
+
+.pwy{margin:8px 0 6px;font-size:13px;color:#f0b429}
+.pwo{margin:4px 0 8px}
+.pwl{display:flex;gap:8px;align-items:baseline;padding:5px 8px;border-radius:5px;
+  font-size:13.5px;line-height:1.45;margin-bottom:3px;background:rgba(255,255,255,.02)}
+.pwl .m{width:12px;flex:none;font-weight:700}
+.pwl.ri{background:rgba(63,185,80,.10);color:#c9f5d0} .pwl.ri .m{color:#3fb950}
+.pwl.fa{background:rgba(248,81,73,.10);color:#f8c8c5} .pwl.fa .m{color:#f85149}
+.pwl.nu{opacity:.55}
+.pwl .tg{margin-left:auto;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:#f85149;white-space:nowrap;padding-left:10px}
+.pwl .tg.ok{color:#3fb950}
+.pws{font-size:11.5px;color:#8b949e;margin:4px 0 6px}
 .pwrong{background:#0f1830;border:1px solid var(--line);border-left:3px solid var(--no);
  border-radius:7px;padding:8px 10px;margin:6px 0;font-size:12.5px}
 .pwrong .pwt{font-size:11px;color:var(--mut);margin-bottom:3px}
@@ -236,6 +249,36 @@ button.opt.sel .box{background:var(--acc);border-color:var(--acc);box-shadow:ins
 .pmodsel button:hover{border-color:var(--acc)}
 .pmodsel .ps{display:block;color:var(--mut);font-size:11.5px;margin-top:3px}
 </style></head><body>
+ 
+<style>
+#geriAna{position:fixed;top:10px;left:10px;z-index:9999;font:500 11.5px/1 ui-monospace,
+  'SF Mono',Menlo,monospace;letter-spacing:.1em;text-decoration:none;color:#8b949e;
+  background:rgba(8,10,12,.86);border:1px solid #30363d;border-radius:6px;padding:8px 11px;
+  backdrop-filter:blur(6px);transition:color .12s,border-color .12s}
+#geriAna:hover{color:#e9ecef;border-color:#f0b429}
+@media print{#geriAna{display:none}}
+</style>
+<a id="geriAna" href="#" title="Ana sayfa (Backspace)">← CESMAT</a>
+<script>
+(function(){
+  var a=document.getElementById('geriAna');
+  function ana(){
+    if(history.length>1){ history.back(); setTimeout(function(){
+      /* geçmişte panel yoksa sayfa değişmez → yerel panele düş */
+      location.href='../CESMAT.html'; }, 350); }
+    else location.href='../CESMAT.html';
+  }
+  a.onclick=function(e){ e.preventDefault(); ana(); };
+  document.addEventListener('keydown',function(e){
+    /* Backspace yalnız bir girdi alanında DEĞİLKEN geri gitsin */
+    var t=e.target.tagName;
+    if(e.key==='Backspace' && t!=='INPUT' && t!=='TEXTAREA' && !e.target.isContentEditable){
+      e.preventDefault(); ana();
+    }
+  });
+})();
+</script>
+
 <div class="wrap">
  <header><h1>QPM · MC-TRAINER</h1><div class="prog" id="prog"></div></header>
  <div class="bar"><i id="barfill"></i></div>
@@ -435,7 +478,7 @@ function karteAngebot(q){
    Ayar dışarıdan enjekte edilir (EXAM===null ⇒ tüm mod kapalı, çip bile çizilmez).
    Kurallar birincil kaynaktan (Entre FAQ): modül başına N soru / P puan / M dakika,
    geçme %60, MC hep-ya-hiç, YANLIŞA CEZA YOK. */
-var EXAM = null;
+var EXAM = {"min": 60, "pkt": 60, "pass": 0.5, "n": 15, "mod": {"Q": "Teil Q · Qualitätsmanagement", "P": "Teil P · Projektmanagement"}, "info": "<b>Die echte Klausur</b> (Folie LE01): <b>120 Minuten, 120 Punkte</b>, zwei Teile — <b>Q-Teil</b> (Qualitätsmanagement) und <b>P-Teil</b> (Projektmanagement); Aufgabenarten: <b>Antwort-Auswahl-Verfahren</b> und <b>Rechenaufgaben</b>. Prüfungsrelevant sind LE 2–7 und 9–13.<br><b>Diese Simulation</b> läuft <b>ein Teil auf einmal</b>: 60 Minuten, 60 Punkte (die Hälfte der echten Klausur) — die Aufteilung ist unsere Wahl, nicht amtlich.<br>⚠️ <b>Bewertungsschlüssel noch unbekannt</b> — laut Folie kommt er erst <b>14 Tage vor der Klausur</b>. Diese Simulation rechnet deshalb nach der <b>strengen</b> Regel: Mehrfachauswahl zählt nur <b>komplett richtig</b>, Teilpunkte gibt es nicht. Wer so übt, ist im milderen Fall überbereit.<br>🔎 <b>Was hier NOCH FEHLT:</b> die <b>Rechenaufgaben</b>. Diese Simulation deckt bisher nur das <b>Antwort-Auswahl-Verfahren</b> ab; das Rechnen übst du im <b>Netzplan-Drill</b> und in den gedruckten Klausuren."};
 var EX = null, exTid = null;
 function exFmt(s){ var m=Math.floor(s/60), x=s%60; return m+":"+(x<10?"0":"")+x; }
 function exOpen(){
@@ -443,11 +486,14 @@ function exOpen(){
   var ov=document.getElementById("pover");
   var h='<div class="pbox"><div class="phead"><div class="pt">🎯 Modulprüfung — Simulation</div>'
    +'<button class="kx2" id="pClose">✕ schließen (Esc)</button></div><div class="pcard">'
-   +'<div class="pline">So läuft die echte Prüfung: jedes Modul ist eine <b>eigene Kachel mit eigenem Timer</b> — '
+   /* Sınav kuralları DERSE GÖRE değişir ⇒ metin EXAM.info'dan gelir. Gömülü metin
+      Entre'nin FAQ'ından ölçülmüştü; QPM'inki başka (120 dk/120 P, iki Teil) ve
+      puanlama kuralı henüz yayımlanmadı. Ders başına doğru metni banka enjekte eder. */
+   +'<div class="pline">'+(EXAM.info || ('So läuft die echte Prüfung: jedes Modul ist eine <b>eigene Kachel mit eigenem Timer</b> — '
    +'<b>'+EXAM.pkt+' Punkte</b>, <b>'+EXAM.min+' Minuten</b>, bestanden ab <b>'
-   +(EXAM.pkt*EXAM.pass).toString().replace(".",",")+' Punkten (60 %)</b>. '
+   +(EXAM.pkt*EXAM.pass).toString().replace(".",",")+' Punkten ('+Math.round(EXAM.pass*100)+' %)</b>. '
    +'Mehrfachauswahl gilt nur <b>komplett richtig</b>; für eine falsche Antwort gibt es aber '
-   +'<b>keinen Punktabzug</b> — leer lassen bringt also nie mehr als raten.</div>'
+   +'<b>keinen Punktabzug</b> — leer lassen bringt also nie mehr als raten.'))+'</div>'
    +'<div class="pmodsel">';
   Object.keys(EXAM.mod).forEach(function(t){
     var n=BANK.filter(function(q){ return q.teil===t; }).length;
@@ -464,7 +510,14 @@ function exOpen(){
 function exClose(){ exStop(); EX=null; document.getElementById("pover").classList.remove("show"); }
 function exStop(){ if(exTid){ clearInterval(exTid); exTid=null; } }
 function exStart(teil){
-  var havuz=BANK.filter(function(q){ return q.teil===teil; });
+  /* 🔴 Sınav ekranı yalnız MC çiziyor (buildOptions + .opt). QPM'de kind = mc|num|text|
+     felder; hesap sorusu havuza girerse ekranda cevaplanacak öğe olmaz ve akış DURUR
+     (ölçüldü 2026-08-03: 15 soru yerine 1 geldi). Havuz MC'ye daraltıldı; gerçek sınavda
+     Rechenaufgaben DE var — o eksik, arayüzde açıkça yazıyor ve drill'de çalışılıyor. */
+  var havuz=BANK.filter(function(q){
+    return q.teil===teil && !q.f && q.type!=="num" && q.type!=="text";
+  });
+  if(!havuz.length){ alert("Bu Teil'de Antwort-Auswahl sorusu yok."); return; }
   var qs=sample(havuz, Math.min(EXAM.n, havuz.length));
   EX={ teil:teil, qs:qs, i:0, ergebnis:[], sel:new Set(), opts:[], left:EXAM.min*60,
        ppf:EXAM.pkt/Math.min(EXAM.n,havuz.length) };
@@ -520,8 +573,13 @@ function exAbgeben(skip){
   var s=st(q.id); s.seen++; s.last=S.tick;      /* Bilanz sayaçları beslenir, seri DEĞİŞMEZ */
   if(skip||!EX.sel.size) s.skip++; else if(!ok) s.wrong++;
   save();
+   
+  var _dogruIdx=EX.opts.map(function(o,i){ return i; })
+                       .filter(function(i){ return q._set.has(sha256(SALT+EX.opts[i])); });
   EX.ergebnis.push({id:q.id, ok:ok, skip:!!(skip||!EX.sel.size), topic:q.topic,
-                    stem:q.stems[0], k:q.k||null});
+                    stem:q.stems[0], k:q.k||null,
+                    opts:EX.opts.slice(), dogru:_dogruIdx,
+                    secim:Array.from(EX.sel), multi:!!q.m, src:q.src||""});
   EX.i++; exDraw();
 }
 function exEnde(zeit){
@@ -544,9 +602,33 @@ function exEnde(zeit){
   if(schlecht.length){
     h+='<div class="ks" style="margin-top:14px">Hier ist es gekippt — Thema nachlesen</div>';
     schlecht.forEach(function(r){
+      /* Her yanlış soru için: TAM gövde + her şık işaretli (✓ doğru · ✗ senin seçimin)
+         + kaçırdığın/fazladan seçtiğin özeti. „Sadece konuya bak" yetmiyordu. */
+      var opt='';
+      if(r.opts && r.opts.length){
+        opt='<div class="pwo">'+r.opts.map(function(o,i){
+          var dg=r.dogru.indexOf(i)>=0, sc=(r.secim||[]).indexOf(i)>=0;
+          var cls=dg?'ri':(sc?'fa':'nu');
+          var mark=dg?'✓':(sc?'✗':'·');
+          return '<div class="pwl '+cls+'"><span class="m">'+mark+'</span>'+bEsc(o)
+               +(sc&&!dg?'<span class="tg">deine Wahl</span>':'')
+               +(dg&&!sc?'<span class="tg ok">fehlte dir</span>':'')+'</div>';
+        }).join('')+'</div>';
+        var kacirdi=r.dogru.filter(function(i){ return (r.secim||[]).indexOf(i)<0; }).length;
+        var fazla=(r.secim||[]).filter(function(i){ return r.dogru.indexOf(i)<0; }).length;
+        var neden=r.skip?'ausgelassen'
+          :(r.multi
+            ? ((kacirdi?kacirdi+' richtige nicht gewählt':'')
+               +(kacirdi&&fazla?' · ':'')
+               +(fazla?fazla+' falsche gewählt':'')
+               +' → Mehrfachauswahl zählt nur <b>komplett</b> richtig, deshalb 0 P')
+            : 'die gewählte Aussage ist nicht die richtige');
+        opt='<div class="pwy">'+neden+'</div>'+opt;
+      }
       h+='<div class="pwrong"><div class="pwt">'+bEsc(r.topic)+(r.skip?' · ausgelassen':' · falsch')+'</div>'
-        +bEsc(r.stem.length>110?r.stem.slice(0,108)+'…':r.stem)
-        +(r.k?'<br><button data-k="'+r.k+'">📖 Themenkarte</button>':'')+'</div>';
+        +bEsc(r.stem)+opt
+        +(r.src?'<div class="pws">Folie: '+bEsc(r.src)+'</div>':'')
+        +(r.k?'<button data-k="'+r.k+'">📖 Themenkarte</button>':'')+'</div>';
     });
   }
   h+='<div class="pfoot"><button class="cbtn sure" id="pAgain">Nochmal</button>'

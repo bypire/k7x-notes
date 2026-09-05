@@ -546,6 +546,7 @@ function exStart(teil){
   });
   if(!havuz.length){ alert("Bu Teil'de Antwort-Auswahl sorusu yok."); return; }
   var qs=sample(havuz, Math.min(EXAM.n, havuz.length));
+  stopTimer();                 /* ana trainer sayacı sınav sırasında ARKADA İŞLEMESİN */
   EX={ teil:teil, qs:qs, i:0, ergebnis:[], sel:new Set(), opts:[], left:EXAM.min*60,
        ppf:EXAM.pkt/Math.min(EXAM.n,havuz.length) };
   exStop();
@@ -766,6 +767,7 @@ function pickQ(){
 /* ---- render ---- */
 let cur=null,curOpts=[],sel=null,selSet=new Set(),locked=false,kind='mc',fWerte=[];
 function draw(){
+  if(typeof EX!=='undefined' && EX) return;   /* sınav açıkken ana kart çizilmez */
   if(bkOpen) return;                 // 🪣 Bucket-Ansicht offen → normales Ziehen nicht überschreiben
   sel=null; selSet=new Set(); locked=false; fWerte=[]; stopTimer();
   const sc=scope(), tot=sc.length, m=sc.filter(isMast).length;
@@ -850,7 +852,7 @@ function draw(){
         <button class="cbtn sure"  id="bSure">Sicher &nbsp;<span class="small">(Enter)</span></button>
         <button class="cbtn guess" id="bGuess">Geraten &nbsp;<span class="small">(G)</span></button>
       </div></div>`;
-  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>select(+b.dataset.i));
+  document.querySelectorAll('#card .opt').forEach(b=>b.onclick=()=>select(+b.dataset.i));
   /* 🪣 Abkürzung: BASILI TUT (600 ms) → bucket'a ekle */
   if(kind==="text"){
     const qEl=card.querySelector(".q");
@@ -916,11 +918,13 @@ function startTimer(){
 }
 /* ---- „Weiß nicht“ / Zeit abgelaufen: kein Kredit, Serie zurück ---- */
 function unknown(byTime){
+   
+  if(typeof EX!=='undefined' && EX) return;
   if(locked||!cur) return;
   locked=true; stopTimer();
   const s=st(cur.id); s.seen++; s.last=S.tick; s.streak=0; s.mastered=false; s.shaky=true; s.skip++;
   sess.a++; sess.w++; save();
-  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  document.querySelectorAll('#card .opt').forEach(b=>b.disabled=true);
   const w=document.getElementById("bWN"); if(w) w.disabled=true;
   document.getElementById("conf").classList.remove("show");
   const f=document.getElementById("flash");
@@ -934,11 +938,11 @@ function select(i){
   stopTimer();                 // Recall ist vorbei — die Sicher/Geraten-Frage ist untimed
   if(cur.m && !cur._neg){
     if(selSet.has(i)) selSet.delete(i); else selSet.add(i);
-    document.querySelectorAll('.opt').forEach(b=>b.classList.toggle('sel',selSet.has(+b.dataset.i)));
+    document.querySelectorAll('#card .opt').forEach(b=>b.classList.toggle('sel',selSet.has(+b.dataset.i)));
     document.getElementById("conf").classList.toggle("show",selSet.size>0);
   } else {
     sel=i;
-    document.querySelectorAll('.opt').forEach(b=>b.classList.toggle('sel',+b.dataset.i===i));
+    document.querySelectorAll('#card .opt').forEach(b=>b.classList.toggle('sel',+b.dataset.i===i));
     document.getElementById("conf").classList.add("show");
   }
 }
@@ -985,7 +989,7 @@ function commit(sure){
     /* geraten + richtig => KEIN Fortschritt (Glück zählt nicht) */
   }
   save();
-  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  document.querySelectorAll('#card .opt').forEach(b=>b.disabled=true);
   if(ni) ni.disabled=true;
   if(ue) ue.disabled=true;
   document.querySelectorAll('.fld input,.fld .wahl button').forEach(b=>b.disabled=true);
